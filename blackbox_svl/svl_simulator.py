@@ -4,13 +4,11 @@
 #
 # This software contains code licensed as described in LICENSE.
 #
-from npc_inpsignal_follow import npc_inpsignal_follow
+
 import os
 from environs import Env
 import lgsvl
-from npc_wapypoint_follow import deserialize_npc_behavior
-from log_reader import deserialize_log_file
-from utils import set_lights_green
+from utils import deserialize_log_file, npc_follow_inpsignal, set_lights_green
 from random import randrange
 
 env = Env()
@@ -93,7 +91,7 @@ def run_test(ego_init_speed_m_s=5.0, ego_x_pos=5.0, pedestrian_speed=3.0, stepti
 
     # get the npc behavior by reading the InpSignal from STALIRO
     #npc_InpSignal_follow("falsification.json", state, sim, steptime, Inpsignal)
-    npc_inpsignal_follow("falsification.json", state, sim, steptime, Inpsignal)
+    npc_follow_inpsignal("falsification.json", state, sim, steptime, Inpsignal)
     #set_lights_green(sim)
     # The simulator can be run for a set amount of time. time_limit is optional and if omitted or set to 0, then the simulator will run indefinitely
     sim.run(time_limit=sim_duration)
