@@ -14,7 +14,7 @@ from lgsvl.geometry import Transform
 
 
 
-def npc_InpSignal_follow(json_file_name,state,sim,steptime,InpSignal):
+def npc_inpsignal_follow(json_file_name,state,sim,steptime,InpSignal):
     npc_state = copy.deepcopy(state)
     npc = None
     waypoints = []

@@ -4,7 +4,7 @@
 #
 # This software contains code licensed as described in LICENSE.
 #
-from npc_InpSignal_follow import npc_InpSignal_follow
+from npc_inpsignal_follow import npc_inpsignal_follow
 import os
 from environs import Env
 import lgsvl
@@ -93,7 +93,7 @@ def run_test(ego_init_speed_m_s=5.0, ego_x_pos=5.0, pedestrian_speed=3.0, stepti
 
     # get the npc behavior by reading the InpSignal from STALIRO
     #npc_InpSignal_follow("falsification.json", state, sim, steptime, Inpsignal)
-    npc_InpSignal_follow("falsification2.json", state, sim, steptime, Inpsignal)
+    npc_inpsignal_follow("falsification.json", state, sim, steptime, Inpsignal)
     #set_lights_green(sim)
     # The simulator can be run for a set amount of time. time_limit is optional and if omitted or set to 0, then the simulator will run indefinitely
     sim.run(time_limit=sim_duration)
