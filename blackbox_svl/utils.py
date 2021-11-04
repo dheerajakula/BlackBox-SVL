@@ -2,6 +2,7 @@ import copy
 import json
 import gzip
 import lgsvl
+import math
 from environs import Env
 
 def set_lights_green(sim):
@@ -76,7 +77,7 @@ def deserialize_log_file(log_file_path):
             final_data.append(per_frame_data)
         return final_data
 
-def npc_follow_inpsignal(json_file_name,state,sim,steptime,InpSignal):
+def npc_follow_inpsignal(json_file_name, state, sim, steptime, InpSignal_Forward, InpSignal_Rightward):
     npc_state = copy.deepcopy(state)
     npc = None
     waypoints = []
@@ -95,9 +96,15 @@ def npc_follow_inpsignal(json_file_name,state,sim,steptime,InpSignal):
     
     
     forward = lgsvl.utils.transform_to_forward(npc_state.transform)
-    for i,inp in enumerate(InpSignal):
-        pos = npc.state.transform.position + forward * inp
-        angle = npc.state.transform.rotation
-        wp = lgsvl.DriveWaypoint(position= pos, angle = angle,speed=100, timestamp=steptime[i])
+    rightward = lgsvl.utils.transform_to_right(npc_state.transform)
+    # Create waypoints based on the input signal
+    length_of_signal = max(len(InpSignal_Forward), len(InpSignal_Rightward))
+    for i in range(0,length_of_signal):
+        inp_forward = InpSignal_Forward[i] if InpSignal_Forward else 0
+        inp_rightward = InpSignal_Rightward[i] if InpSignal_Rightward else 0
+        pos = npc.state.transform.position + forward * inp_forward + rightward * inp_rightward
+        angle_change = math.degrees(math.atan(inp_rightward/(inp_forward+1e-6)))
+        angle = npc.state.transform.rotation + lgsvl.Vector(0, angle_change, 0)
+        wp = lgsvl.DriveWaypoint(position = pos, angle = angle, speed=100, timestamp=steptime[i])
         waypoints.append(wp)
     npc.follow(waypoints)
