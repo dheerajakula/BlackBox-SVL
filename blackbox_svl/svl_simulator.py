@@ -123,11 +123,13 @@ class Simulation:
 
 if __name__ == "__main__":
     input("Press Enter to run the simulation")
-    x = [i for i in range(0,100,1)]
-    y = [i for i in range(0,100,1)]
-    z = [i for i in range(0,100,1)]
+    x = [i for i in range(1,11,1)]
+    y = [i for i in range(1,101,10)]
+    z = [i for i in range(1,51,10)]
+    z += [i for i in range(50,0,-10)]
+
     sim = Simulation("5d272540-f689-4355-83c7-03bf11b6865f")
-    sim.run_test(13.2160, 100.5596, 0,x,y,z,10, False)
+    sim.run_test(13.2160, 100.5596, 0,x,y,None,10, False)
     #run_test(2.755, 15.498, 0,x,y,10, False)
    
     

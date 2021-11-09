@@ -4,6 +4,7 @@ import gzip
 import lgsvl
 import math
 from environs import Env
+import numpy as np
 
 def set_lights_green(sim):
     controllables = sim.get_controllables("signal")
@@ -82,6 +83,12 @@ def npc_follow_inpsignal(json_file_name, state, sim, steptime, InpSignal_Forward
     npc = None
     waypoints = []
     speed = 1
+    npc_type = None
+    if InpSignal_Forward is None:
+        InpSignal_Forward = np.zeros(len(steptime))
+    if InpSignal_Rightward is None:
+        InpSignal_Rightward = np.zeros(len(steptime))
+
     # Read json file to get the initial position of the NPC
     with open(json_file_name) as json_data:
         d = json.load(json_data)
@@ -92,19 +99,48 @@ def npc_follow_inpsignal(json_file_name, state, sim, steptime, InpSignal_Forward
                 angle = lgsvl.Vector(transform['rotation']['x'], transform['rotation']['y'], transform['rotation']['z'])
                 npc_state.transform.position = pos
                 npc_state.transform.rotation = angle
-                npc = sim.add_agent(agent['variant'], lgsvl.AgentType.NPC, npc_state)
+                # npc = sim.add_agent(agent['variant'], lgsvl.AgentType.NPC, npc_state)
+                npc_type = agent['variant']
     
-    
+    npc_origin = npc_state.transform.position
     forward = lgsvl.utils.transform_to_forward(npc_state.transform)
     rightward = lgsvl.utils.transform_to_right(npc_state.transform)
+    npc_start = npc_origin + forward * InpSignal_Forward[0] + rightward * InpSignal_Rightward[0]
+    
     # Create waypoints based on the input signal
     length_of_signal = max(len(InpSignal_Forward), len(InpSignal_Rightward))
-    for i in range(0,length_of_signal):
-        inp_forward = InpSignal_Forward[i] if InpSignal_Forward else 0
-        inp_rightward = InpSignal_Rightward[i] if InpSignal_Rightward else 0
-        pos = npc.state.transform.position + forward * inp_forward + rightward * inp_rightward
-        angle_change = math.degrees(math.atan(inp_rightward/(inp_forward+1e-6)))
-        angle = npc.state.transform.rotation + lgsvl.Vector(0, angle_change, 0)
-        wp = lgsvl.DriveWaypoint(position = pos, angle = angle, speed=100, timestamp=steptime[i])
+
+   
+    prev_timestamp = 0
+    angle_change = math.degrees(math.atan((InpSignal_Rightward[0]+1e-6)/(InpSignal_Forward[0]+1e-6)))
+
+    npc_state.transform.position = npc_start
+    initial_angle = npc_state.transform.rotation
+    npc_state.transform.rotation = initial_angle + lgsvl.Vector(0, angle_change, 0)
+
+    # add npc at the initial position
+    npc = sim.add_agent(npc_type, lgsvl.AgentType.NPC, npc_state)
+    print(length_of_signal)
+
+    for i in range(1,length_of_signal):
+
+        inp_forward = InpSignal_Forward[i]
+        inp_rightward = InpSignal_Rightward[i]
+        prev_inp_forward = InpSignal_Forward[i-1]
+        prev_inp_rightward = InpSignal_Rightward[i-1]
+
+        pos = npc_origin + forward * inp_forward + rightward * inp_rightward
+        
+        angle_change = math.degrees(math.atan((inp_rightward-prev_inp_rightward+1e-6)/(inp_forward-prev_inp_forward+1e-6)))
+
+        if(inp_forward-prev_inp_forward < 0):
+            angle_change += 180
+        angle = initial_angle + lgsvl.Vector(0, angle_change, 0)
+
+        distance = ((inp_forward - prev_inp_forward)**2 + (inp_rightward - prev_inp_rightward)**2)**0.5
+        speed = distance / (steptime[i]- steptime[i-1])
+
+        wp = lgsvl.DriveWaypoint(position = pos, angle = angle, speed=speed, timestamp=steptime[i])
         waypoints.append(wp)
+
     npc.follow(waypoints)
