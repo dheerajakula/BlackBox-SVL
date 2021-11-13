@@ -8,17 +8,18 @@
 import os
 from environs import Env
 import lgsvl
-from utils import deserialize_log_file, npc_follow_inpsignal, set_lights_green
+from utils import deserialize_log_file, set_lights_green
+from Behaviors import *
 from random import randrange
 
-class Simulation:
+class SVLSimulation:
 
     def __init__(self, map_id=None):
         self.env = Env()
         self.sim = lgsvl.Simulator(self.env.str("LGSVL__SIMULATOR_HOST", lgsvl.wise.SimulatorSettings.simulator_host), self.env.int("LGSVL__SIMULATOR_PORT", lgsvl.wise.SimulatorSettings.simulator_port))
         self.map_id = map_id
 
-    def run_test(self, ego_init_speed_m_s=5.0, ego_x_pos=5.0, pedestrian_speed=3.0, steptime=None, Inpsignal_Forward = None, Inpsignal_Rightward = None, sim_duration=5, for_matlab=False):
+    def run_test(self, ego_init_speed_m_s=5.0, ego_x_pos=5.0, pedestrian_speed=3.0, steptime=None, InpSignal = None, Inpsignal_Rightward = None, sim_duration=5, for_matlab=False):
         
         # if sim.current_scene == lgsvl.wise.DefaultAssets.map_borregasave:
         # if sim.current_scene == "5d272540-f689-4355-83c7-03bf11b6865f":    
@@ -104,7 +105,11 @@ class Simulation:
 
         # get the npc behavior by reading the InpSignal from STALIRO
         #npc_InpSignal_follow("falsification.json", state, sim, steptime, Inpsignal)
-        npc_follow_inpsignal("falsification.json", state, self.sim, steptime, Inpsignal_Forward, Inpsignal_Rightward)
+        behavior  = Behaviors("falsification.json", state, self.sim, steptime)
+        #behavior.FollowInpSignal(InpSignal)
+        points = np.array([[12.3, 20.3], [30, 120], [3, 4]])
+        behavior.FollowPoints(points)
+
         #set_lights_green(sim)
         # The simulator can be run for a set amount of time. time_limit is optional and if omitted or set to 0, then the simulator will run indefinitely
         self.sim.run(time_limit=sim_duration)
@@ -125,11 +130,15 @@ if __name__ == "__main__":
     input("Press Enter to run the simulation")
     x = [i for i in range(1,11,1)]
     y = [i for i in range(1,101,10)]
-    z = [i for i in range(1,51,10)]
-    z += [i for i in range(50,0,-10)]
+    z = [-i for i in range(1,51,10)]
+    z += [-i for i in range(50,0,-10)]
 
-    sim = Simulation("5d272540-f689-4355-83c7-03bf11b6865f")
-    sim.run_test(13.2160, 100.5596, 0,x,y,None,10, False)
+    print(len(x))
+    print(len(y))
+    print(len(z))
+    sim = SVLSimulation("5d272540-f689-4355-83c7-03bf11b6865f")
+    InpSignal = [y,z]
+    sim.run_test(ego_init_speed_m_s = 0, steptime = x, InpSignal=InpSignal, sim_duration = 30, for_matlab = False)
     #run_test(2.755, 15.498, 0,x,y,10, False)
    
     
