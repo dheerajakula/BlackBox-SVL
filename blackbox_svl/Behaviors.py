@@ -119,6 +119,7 @@ class Behaviors:
         npc_state = copy.deepcopy(self.state)
         npc = None
         waypoints = []
+        npc_type = None
         speed = 1
         # Read json file to get the initial position of the NPC
         with open(self.ConfigFile) as json_data:
@@ -130,6 +131,7 @@ class Behaviors:
                     angle = lgsvl.Vector(transform['rotation']['x'], transform['rotation']['y'], transform['rotation']['z'])
                     npc_state.transform.position = pos
                     npc_state.transform.rotation = angle
+                    npc_type = agent['variant']
                     npc = self.sim.add_agent(agent['variant'], lgsvl.AgentType.NPC, npc_state)
 
 
@@ -172,5 +174,5 @@ class Behaviors:
             pos = lgsvl.Vector(spline_x[i], pos_y, spline_z[i])
             wp = lgsvl.DriveWaypoint(position= pos, speed = 10)
             waypoints.append(wp)
-            
+
         npc.follow(waypoints)
