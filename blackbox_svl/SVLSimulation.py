@@ -107,7 +107,7 @@ class SVLSimulation:
         #npc_InpSignal_follow("falsification.json", state, sim, steptime, Inpsignal)
         behavior  = Behaviors("falsification.json", state, self.sim, steptime)
         #behavior.FollowInpSignal(InpSignal)
-        points = np.array([[12.3, 20.3], [30, 120], [3, 4]])
+        points = np.array([[-200, 20], [5.4, 15], [5.6, 10]])
         behavior.FollowPoints(points)
 
         #set_lights_green(sim)
