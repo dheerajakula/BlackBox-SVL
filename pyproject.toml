@@ -5,10 +5,13 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8,<3.11"
+python = ">=3.8,<3.10"
 lgsvl = {git = "https://github.com/lgsvl/PythonAPI.git"}
 scipy = "^1.7.2"
 matplotlib = "^3.4.3"
+psy-taliro = "^1.0.0-beta.2"
+rtamt = {git = "https://github.com/nickovic/rtamt.git"}
+tltk-mtl = "^0.0.27"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

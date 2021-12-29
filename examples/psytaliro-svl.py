@@ -2,7 +2,7 @@ import logging
 import math
 
 import numpy as np
-from blackbox_svl import SVLSimulationsva
+from blackbox_svl.SVLSimulation import SVLSimulation
 from numpy.typing import NDArray
 from staliro.core.model import Failure
 from staliro.core.model import Model, ModelData, Failure, StaticInput, Signals
@@ -11,7 +11,7 @@ from staliro.core.sample import Sample
 from staliro.models import StaticInput, SignalTimes, SignalValues, ModelData, blackbox
 from staliro.optimizers import DualAnnealing
 from staliro.options import Options, SignalOptions
-from staliro.specifications import RTAMTDense
+from staliro.specifications import RTAMTDense,TLTK
 from staliro.staliro import staliro, simulate_model
 from staliro.signals import Pchip, PiecewiseLinear
 
@@ -55,9 +55,10 @@ def svl_model(static: StaticInput, times: SignalTimes, signals: SignalValues) ->
 
 
 # phi = "[](!(AGENT_Y - EGO_Y <= 1.5 /\ EGO_Y - AGENT_Y <= 1.5  /\ AGENT_X - EGO_X <= 8 /\ EGO_X - AGENT_X <= 0))"
-#phi = "always (not (Ydiff <= 1.5 and Ydiff >= 1.5 and Xdiff <= 8 and Xdiff >= 0))"
+#phi = "always[0,14.9] (not (Ydiff <= 1.5 and Ydiff >= -1.5 and Xdiff <= 8 and Xdiff >= 0))"
+phi = "always[0,inf] (not (Ydiff <= 1.5 and Ydiff >= -1.5 and Xdiff <= 8 and Xdiff >= 0))"
 # phi = "always (not (Ydiff <= 2 and Ydiff >= -2 and Xdiff <= 5 and Xdiff <= 0))"
-phi = "always (not (Ydiff <= 2 and Ydiff >= -2 and Xdiff <= 0))"
+# phi = "always[0,14.9] (not (Ydiff <= 2 and Ydiff >= -2 and Xdiff <= 0))"
 # predicates = {
 #     "EGO_X" : 0,
 #     "EGO_Y" : 1,
@@ -74,7 +75,8 @@ predicates = {
     "Xdiff" : 0,
     "Ydiff" : 1,
 }
-specification = RTAMTDense(phi, predicates)
+#specification = RTAMTDense(phi, predicates)
+specification = TLTK(phi, predicates)
 
 optimizer = DualAnnealing()
 
@@ -85,11 +87,11 @@ initial_conditions = [
 ]
 
 signals = [
-    SignalOptions((0, 100), factory=PiecewiseLinear, control_points=3),
+    SignalOptions((0, 10), factory=PiecewiseLinear, control_points=3),
     #SignalOptions((0, 100), factory=PiecewiseLinear, control_points=3),
 ]
 
-options = Options(runs=1, iterations=10, interval=(0, 15), static_parameters=initial_conditions, signals=signals)
+options = Options(runs=1, iterations=100, interval=(0, 15), static_parameters=initial_conditions, signals=signals)
 
 if __name__ == "__main__":
     svl_sim = SVLSimulation("5d272540-f689-4355-83c7-03bf11b6865f")

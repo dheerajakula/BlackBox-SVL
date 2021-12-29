@@ -1,4 +1,12 @@
 [[package]]
+name = "antlr4-python3-runtime"
+version = "4.5.3"
+description = "ANTLR 4.5.3 runtime for Python 3.4.0"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "atomicwrites"
 version = "1.4.0"
 description = "Atomic file writes."
@@ -10,7 +18,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "attrs"
 version = "21.2.0"
 description = "Classes Without Boilerplate"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
@@ -163,6 +171,21 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 dev = ["pre-commit", "tox"]
 
 [[package]]
+name = "psy-taliro"
+version = "1.0.0b2"
+description = "System-level verification library using STL"
+category = "main"
+optional = false
+python-versions = ">=3.7.1,<3.10"
+
+[package.dependencies]
+antlr4-python3-runtime = ">=4.5.3,<4.6.0"
+attrs = ">=21.0.0,<22.0.0"
+numpy = ">=1.20.2,<2.0.0"
+scipy = ">=1.6.2,<2.0.0"
+typing-extensions = ">=3.10.0,<4.0.0"
+
+[[package]]
 name = "py"
 version = "1.10.0"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
@@ -223,6 +246,24 @@ python-versions = ">=3.5"
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "rtamt"
+version = "0.2.7"
+description = ""
+category = "main"
+optional = false
+python-versions = ">=2.7"
+develop = false
+
+[package.dependencies]
+antlr4-python3-runtime = {version = ">=4.5,<4.6", markers = "python_version >= \"3\""}
+
+[package.source]
+type = "git"
+url = "https://github.com/nickovic/rtamt.git"
+reference = "master"
+resolved_reference = "a16db77b61028f774d81457ff22e666229a5432c"
+
+[[package]]
 name = "scipy"
 version = "1.7.2"
 description = "SciPy: Scientific Library for Python"
@@ -240,6 +281,25 @@ description = "Python 2 and 3 compatibility utilities"
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[[package]]
+name = "tltk-mtl"
+version = "0.0.27"
+description = "A libary for effecient Metric temporal logic calculation"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+numpy = "*"
+
+[[package]]
+name = "typing-extensions"
+version = "3.10.0.2"
+description = "Backported and Experimental Type Hints for Python 3.5+"
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "wcwidth"
@@ -271,10 +331,14 @@ python-versions = ">=3.7"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.8,<3.11"
-content-hash = "1d87037b6d0ad31ee325109fd54caea9dcd086cadccd35906ddbf289d3fdafae"
+python-versions = ">=3.8,<3.10"
+content-hash = "ddc72b0a3178187cc914b947ace8cc19c7d06d841ba76dda098ef782b7c05236"
 
 [metadata.files]
+antlr4-python3-runtime = [
+    {file = "antlr4-python3-runtime-4.5.3.macosx-10.10-x86_64.exe", hash = "sha256:fa539e98d5e801c38d14ce8932a62a708841609ce28c80f8200fbbe288fc6490"},
+    {file = "antlr4-python3-runtime-4.5.3.tar.gz", hash = "sha256:d490754e5774e58b4e870a7eba3f97086c1f3793deb08cfb92307f287dfd4ff2"},
+]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
     {file = "atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a"},
@@ -454,6 +518,10 @@ pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
     {file = "pluggy-0.13.1.tar.gz", hash = "sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0"},
 ]
+psy-taliro = [
+    {file = "PSY-TaLiRo-1.0.0b2.tar.gz", hash = "sha256:4cedb9617deec1f3dc6c6ec16c54006307187820d1ff5dfc25de4e45b1036348"},
+    {file = "PSY_TaLiRo-1.0.0b2-py3-none-any.whl", hash = "sha256:20510680e20c658004946291d2d0bc51179d14e7cce4a668c776644d0b4bcaeb"},
+]
 py = [
     {file = "py-1.10.0-py2.py3-none-any.whl", hash = "sha256:3b80836aa6d1feeaa108e046da6423ab8f6ceda6468545ae8d02d9d58d18818a"},
     {file = "py-1.10.0.tar.gz", hash = "sha256:21b81bda15b66ef5e1a777a21c4dcd9c20ad3efd0b3f817e7a809035269e1bd3"},
@@ -474,6 +542,7 @@ python-dotenv = [
     {file = "python-dotenv-0.19.1.tar.gz", hash = "sha256:14f8185cc8d494662683e6914addcb7e95374771e707601dfc70166946b4c4b8"},
     {file = "python_dotenv-0.19.1-py2.py3-none-any.whl", hash = "sha256:bbd3da593fc49c249397cbfbcc449cf36cb02e75afc8157fcc6a81df6fb7750a"},
 ]
+rtamt = []
 scipy = [
     {file = "scipy-1.7.2-1-cp310-cp310-win_amd64.whl", hash = "sha256:dc2d1bf41294e63c7302bf499973ac0c7f73c93c01763db43055f6525234bf11"},
     {file = "scipy-1.7.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:97eb573e361a73a553b915dc195c6f72a08249964b1a33f157f9659f3b6210d1"},
@@ -503,6 +572,14 @@ scipy = [
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
+]
+tltk-mtl = [
+    {file = "tltk_mtl-0.0.27.tar.gz", hash = "sha256:7d84675bffb69046f5c27a3f879831fc6adc2fd5278e2960098422e4781f69f8"},
+]
+typing-extensions = [
+    {file = "typing_extensions-3.10.0.2-py2-none-any.whl", hash = "sha256:d8226d10bc02a29bcc81df19a26e56a9647f8b0a6d4a83924139f4a8b01f17b7"},
+    {file = "typing_extensions-3.10.0.2-py3-none-any.whl", hash = "sha256:f1d25edafde516b146ecd0613dabcc61409817af4766fbbcfb8d1ad4ec441a34"},
+    {file = "typing_extensions-3.10.0.2.tar.gz", hash = "sha256:49f75d16ff11f1cd258e1b988ccff82a3ca5570217d7ad8c5f48205dd99a677e"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},

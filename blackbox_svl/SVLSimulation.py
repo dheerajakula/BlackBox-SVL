@@ -8,8 +8,8 @@
 import os
 from environs import Env
 import lgsvl
-from utils import deserialize_log_file, set_lights_green
-from Behaviors import *
+from blackbox_svl.utils import deserialize_log_file, set_lights_green
+from blackbox_svl.Behaviors import *
 from random import randrange
 
 class SVLSimulation:
@@ -106,9 +106,9 @@ class SVLSimulation:
         # get the npc behavior by reading the InpSignal from STALIRO
         #npc_InpSignal_follow("falsification.json", state, sim, steptime, Inpsignal)
         behavior  = Behaviors("falsification.json", state, self.sim, steptime)
-        #behavior.FollowInpSignal(InpSignal)
-        points = np.array([[-200, 20], [5.4, 15], [5.6, 10]])
-        behavior.FollowPoints(points)
+        behavior.FollowInpSignal(InpSignal)
+        #points = np.array([[-200, 20], [5.4, 15], [5.6, 10]])
+        #behavior.FollowPoints(points)
 
         #set_lights_green(sim)
         # The simulator can be run for a set amount of time. time_limit is optional and if omitted or set to 0, then the simulator will run indefinitely
