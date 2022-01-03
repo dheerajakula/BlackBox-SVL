@@ -33,7 +33,10 @@ def svl_model(static: StaticInput, times: SignalTimes, signals: SignalValues) ->
     #signal = [forward, rightward]
     signal = [forward]
 
-    result = svl_sim.run_test(ego_init_speed_m_s, ego_x_pos, pedestrian_speed=0, steptime=times, InpSignal=signal, sim_duration=15, for_matlab=False)
+    #result = svl_sim.run_test(ego_init_speed_m_s, ego_x_pos, pedestrian_speed=0, steptime=times, InpSignal=signal, sim_duration=15, for_matlab=False)
+    points = np.array([[-200, 20], [5.4, 15], [5.6, 10]])
+    points = np.array([[-206, 217], [5.4, 15], [5.6, 10]])
+    result = svl_sim.run_test(ego_init_speed_m_s, ego_x_pos, pedestrian_speed=0, steptime=times, Points = points, InpSignal=None, sim_duration=15, for_matlab=False)
 
     #result = run_test(ego_init_speed_m_s, ego_x_pos, pedestrian_speed, steptime=times, Inpsignal_Forward = forward, Inpsignal_Rightward = rightward, sim_duration=10, for_matlab=False)
     #result = [[0.0, -4.998257, 3.815833, 0.9999994, 10.0147066, 43.00901, 155.4264, 0.323286742, 100.0001, 0.0, 0.0], [0.09999990463256836, -4.982434, 4.809959, 0.9999802, 9.868695, 39.3453026, 150.689972, 0.323287636, 1.70551479, 0.0, 0.0], [0.19999980926513672, -4.967915, 5.78444672, 0.9999616, 9.648887, 39.2508049, 150.567749, 0.323288351, 1.70337427, 0.0, 0.0], [0.2999997138977051, -4.95423365, 6.737262, 0.9999609, 9.43425, 39.1563225, 150.445541, 0.323288649, 1.70123374, 0.0, 0.0], [0.39999961853027344, -4.94004154, 7.669006, 0.9999631, 9.225157, 39.0619545, 150.3236, 0.32328862, 1.69788623, 0.0, 0.0], [0.4999995231628418, -4.92532, 8.579951, 0.9999624, 9.017039, 38.96768, 150.201843, 0.323288441, 0.1141549, 0.0, 0.0], [0.5999994277954102, -4.910553, 9.469978, 0.999960542, 8.806789, 38.8639259, 150.0677, 0.323288172, 1.69574571, 0.0, 0.0], [0.6999993324279785, -4.89621973, 10.3387918, 0.9999596, 8.593539, 38.7699928, 149.946259, 0.323287845, 1.69267154, 0.0, 0.0], [0.7999992370605469, -4.88225031, 11.1827526, 0.99995923, 8.319785, 38.6762161, 149.825043, 0.323287517, 1.69146466, 0.0, 0.0], [0.8999991416931152, -4.868645, 12.0019789, 0.999959, 8.09741, 38.58259, 149.703949, 0.323287219, 1.68811715, 0.0, 0.0]]
@@ -41,10 +44,10 @@ def svl_model(static: StaticInput, times: SignalTimes, signals: SignalValues) ->
 
     # get the column for agent_x at index 5 and subtract ego_x at index 1
     Xdiff = result[:,5] - result[:,1]
-    print(Xdiff)
+    #print(Xdiff)
     # get the column for agent_y at index 6 and subtract ego_y at index 2
     Ydiff = result[:,6] - result[:,2]
-    print(Ydiff)
+    #print(Ydiff)
     # stack these two columns together
     traj = np.column_stack((Xdiff, Ydiff))
     
@@ -87,7 +90,7 @@ initial_conditions = [
 ]
 
 signals = [
-    SignalOptions((0, 10), factory=PiecewiseLinear, control_points=3),
+    SignalOptions((0, 100), factory=PiecewiseLinear, control_points=3),
     #SignalOptions((0, 100), factory=PiecewiseLinear, control_points=3),
 ]
 

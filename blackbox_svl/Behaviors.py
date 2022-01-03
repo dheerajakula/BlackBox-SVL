@@ -18,11 +18,11 @@ class Behaviors:
 
     def FollowInpSignal(self, InpSignal):
         if(len(InpSignal) == 1):
-            self.FollowForward(InpSignal[0])
+            self.FollowSignal(InpSignal[0])
         else:
-            self.FollowForwardRightward(InpSignal[0], InpSignal[1])
+            self.FollowSignal2D(InpSignal[0], InpSignal[1])
 
-    def FollowForwardRightward(self, InpSignal_Forward, InpSignal_Rightward):
+    def FollowSignal2D(self, InpSignal_Forward, InpSignal_Rightward):
         npc_state = copy.deepcopy(self.state)
         npc = None
         waypoints = []
@@ -89,7 +89,7 @@ class Behaviors:
 
         npc.follow(waypoints)
 
-    def FollowForward(self, InpSignal):
+    def FollowSignal(self, InpSignal):
         npc_state = copy.deepcopy(self.state)
         npc = None
         waypoints = []
@@ -133,9 +133,6 @@ class Behaviors:
                     npc_state.transform.rotation = angle
                     npc_type = agent['variant']
                     npc = self.sim.add_agent(agent['variant'], lgsvl.AgentType.NPC, npc_state)
-
-
-        
 
         # get the initial position of the NPC and add it to points
         pos_x = npc.state.transform.position.x

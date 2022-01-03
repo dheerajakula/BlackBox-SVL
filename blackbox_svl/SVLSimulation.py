@@ -18,16 +18,10 @@ class SVLSimulation:
         self.env = Env()
         self.sim = lgsvl.Simulator(self.env.str("LGSVL__SIMULATOR_HOST", lgsvl.wise.SimulatorSettings.simulator_host), self.env.int("LGSVL__SIMULATOR_PORT", lgsvl.wise.SimulatorSettings.simulator_port))
         self.map_id = map_id
+        self.ego = None
+        self.dummy_ego = None
 
-    def run_test(self, ego_init_speed_m_s=5.0, ego_x_pos=5.0, pedestrian_speed=3.0, steptime=None, InpSignal = None, Inpsignal_Rightward = None, sim_duration=5, for_matlab=False):
-        
-        # if sim.current_scene == lgsvl.wise.DefaultAssets.map_borregasave:
-        # if sim.current_scene == "5d272540-f689-4355-83c7-03bf11b6865f":    
-        #     sim.reset()
-        # else:
-        #     #sim.load(lgsvl.wise.DefaultAssets.map_borregasave, 42)
-        #     sim.load("5d272540-f689-4355-83c7-03bf11b6865f", 42)
-        
+    def reload_map(self):
         if self.map_id is not None:
             if self.sim.current_scene == self.map_id:    
                 self.sim.reset()
@@ -39,6 +33,31 @@ class SVLSimulation:
             else:
                 self.sim.load(lgsvl.wise.DefaultAssets.map_borregasave, 42)
 
+    def connect_to_apollo(self, ego):
+        BRIDGE_HOST = "10.218.101.181"
+        BRIDGE_PORT = 9090
+        # Dreamview setup
+        dv = lgsvl.dreamview.Connection(self.sim, ego, BRIDGE_HOST)
+        dv.set_hd_map('San Francisco')
+        dv.set_vehicle('Lincoln2017MKZ LGSVL')
+        modules = [
+            'Localization',
+            'Transform',
+            'Routing',
+            'Prediction',
+            'Planning',
+            'Control'
+        ]
+        spawns = self.sim.get_spawn()
+        destination = spawns[0].destinations[1]
+        
+        dv.enable_apollo(destination.position.x, destination.position.z, modules)
+
+
+        # connect ego vehicle with our apollo bridge
+        ego.connect_bridge(BRIDGE_HOST, BRIDGE_PORT)
+
+    def initialize_ego(self, ego_x_pos, ego_init_speed_m_s):
         spawns = self.sim.get_spawn()
         state = lgsvl.AgentState()
         state.transform = spawns[0]
@@ -53,29 +72,10 @@ class SVLSimulation:
         state.velocity = ego_init_speed_m_s * forward
 
         ego = self.sim.add_agent("2e9095fa-c9b9-4f3f-8d7d-65fa2bb03921", lgsvl.AgentType.EGO, state)
-        
-        BRIDGE_HOST = "10.218.101.181"
-        # Dreamview setup
-        dv = lgsvl.dreamview.Connection(self.sim, ego, BRIDGE_HOST)
-        dv.set_hd_map('San Francisco')
-        dv.set_vehicle('Lincoln2017MKZ LGSVL')
-        modules = [
-            'Localization',
-            'Transform',
-            'Routing',
-            'Prediction',
-            'Planning',
-            'Control'
-        ]
-        destination = spawns[0].destinations[1]
-        
-        dv.enable_apollo(destination.position.x, destination.position.z, modules)
+        self.ego = ego
 
-
-        # connect ego vehicle with our apollo bridge
-        BRIDGE_HOST = "10.218.101.181"
-        BRIDGE_PORT = 9090
-        ego.connect_bridge(BRIDGE_HOST, BRIDGE_PORT)
+        self.connect_to_apollo(self.ego)
+        
         # change the state so that dummy ego is behind the ego
         spawns = self.sim.get_spawn()
         dummy_state = lgsvl.AgentState()
@@ -84,14 +84,36 @@ class SVLSimulation:
         dummy_state.transform.position += 5*right
         # spawn a dummy ego to collect the trace of the ego vehicle. 
         dummy_ego = self.sim.add_agent("34c713df-2fd3-43f7-8756-9576735013f1", lgsvl.AgentType.EGO, dummy_state)
-    
+        self.dummy_ego = dummy_ego
 
         # connect dummy ego vehicle with our logging bridge
         # dummy host and dummy port are used to connect to the simulator
         BRIDGE_HOST_LOG = os.environ.get("LGSVL__AUTOPILOT_0_HOST", "LOG")
         BRIDGE_PORT_LOG = int(os.environ.get("LGSVL__AUTOPILOT_0_PORT", 9090))
-        dummy_ego.connect_bridge(BRIDGE_HOST_LOG,BRIDGE_PORT_LOG)
+        self.dummy_ego.connect_bridge(BRIDGE_HOST_LOG,BRIDGE_PORT_LOG)
 
+    def collect_trace(self):
+        BRIDGE_HOST = os.environ.get("LGSVL__AUTOPILOT_0_HOST", "DISCONNECT")
+        BRIDGE_PORT = int(os.environ.get("LGSVL__AUTOPILOT_0_PORT", 9090))
+        self.dummy_ego.connect_bridge(BRIDGE_HOST,BRIDGE_PORT)
+        # windows log file path
+        # final_data = deserialize_log_file("C:\\Users\\dheer\\AppData\\LocalLow\\LGElectronics\\SVLSimulator\\simulation_log.json.gz")
+        # linux log file path
+        final_data = deserialize_log_file("/home/local/ASUAD/vakula1/.config/unity3d/LGElectronics/SVLSimulator/simulation_log.json.gz")
+        return final_data
+
+    def run_test(self, ego_init_speed_m_s=5.0, ego_x_pos=5.0, pedestrian_speed=3.0, steptime=None, InpSignal = None, Points = None, sim_duration=5, for_matlab=False):
+        
+        # if sim.current_scene == lgsvl.wise.DefaultAssets.map_borregasave:
+        # if sim.current_scene == "5d272540-f689-4355-83c7-03bf11b6865f":    
+        #     sim.reset()
+        # else:
+        #     #sim.load(lgsvl.wise.DefaultAssets.map_borregasave, 42)
+        #     sim.load("5d272540-f689-4355-83c7-03bf11b6865f", 42)
+        
+        self.reload_map()
+
+        self.initialize_ego(ego_x_pos, ego_init_speed_m_s)
         #The bounding box of an agent are 2 points (min and max) such that the box formed from those 2 points completely encases the agent
         #print("Vehicle bounding box =", ego.bounding_box)
 
@@ -105,8 +127,13 @@ class SVLSimulation:
 
         # get the npc behavior by reading the InpSignal from STALIRO
         #npc_InpSignal_follow("falsification.json", state, sim, steptime, Inpsignal)
+        state = lgsvl.AgentState()
         behavior  = Behaviors("falsification.json", state, self.sim, steptime)
-        behavior.FollowInpSignal(InpSignal)
+        if(InpSignal is not None):
+            behavior.FollowInpSignal(InpSignal)
+        elif(Points is not None):
+            behavior.FollowPoints(Points)
+        #behavior.FollowInpSignal(InpSignal)
         #points = np.array([[-200, 20], [5.4, 15], [5.6, 10]])
         #behavior.FollowPoints(points)
 
@@ -115,13 +142,9 @@ class SVLSimulation:
         self.sim.run(time_limit=sim_duration)
         
         self.sim.stop()
-        BRIDGE_HOST = os.environ.get("LGSVL__AUTOPILOT_0_HOST", "DISCONNECT")
-        BRIDGE_PORT = int(os.environ.get("LGSVL__AUTOPILOT_0_PORT", 9090))
-        dummy_ego.connect_bridge(BRIDGE_HOST,BRIDGE_PORT)
-        # windows log file path
-        # final_data = deserialize_log_file("C:\\Users\\dheer\\AppData\\LocalLow\\LGElectronics\\SVLSimulator\\simulation_log.json.gz")
-        # linux log file path
-        final_data = deserialize_log_file("/home/local/ASUAD/vakula1/.config/unity3d/LGElectronics/SVLSimulator/simulation_log.json.gz")
+
+        final_data = self.collect_trace()
+     
         # print("Current ending time = ", sim.current_time)
         # print("Current ending frame = ", sim.current_frame)
         return final_data

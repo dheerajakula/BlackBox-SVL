@@ -41,10 +41,10 @@ def svl_model(static: StaticInput, times: SignalTimes, signals: SignalValues) ->
 
     # get the column for agent_x at index 5 and subtract ego_x at index 1
     Xdiff = result[:,5] - result[:,1]
-    print(Xdiff)
+    #print(Xdiff)
     # get the column for agent_y at index 6 and subtract ego_y at index 2
     Ydiff = result[:,6] - result[:,2]
-    print(Ydiff)
+    #print(Ydiff)
     # stack these two columns together
     traj = np.column_stack((Xdiff, Ydiff))
     
