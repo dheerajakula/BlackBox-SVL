@@ -3,8 +3,10 @@
     1. Clone the repository:
     `git clone https://github.com/dheerajakula/BlackBox-SVL`
     2. Install the necessary packages
-    `cd BlackBox-SVL`
-    `poetry install`
+        ```
+        cd BlackBox-SVL
+        poetry install
+        ```
 
 ## Installing SVL simulator
 1. Clone the repository make sure you have git lfs installed.
